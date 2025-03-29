@@ -7,13 +7,28 @@ import (
 	"strings"
 )
 
+type config struct {
+	page int
+}
+
+func (c *config) Next() string {
+	c.page++
+	return fmt.Sprintf("https://pokeapi.co/api/v2/location?limit=20&offset=%d", c.page*20)
+}
+func (c *config) Previous() string {
+	if c.page > 0 {
+		c.page--
+	}
+	return fmt.Sprintf("https://pokeapi.co/api/v2/location?limit=20&offset=%d", c.page*20)
+}
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(config *config) error
 }
 
-func startRepl() {
+func startRepl(cfg *config) {
 	supportedCommands := getCommands()
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -25,11 +40,12 @@ func startRepl() {
 		}
 		command, ok := supportedCommands[words[0]]
 		if !ok {
-			fmt.Print("Unknown command")
+			fmt.Println("Unknown command")
+			continue
 		}
-		err := command.callback()
+		err := command.callback(cfg)
 		if err != nil {
-			fmt.Print("Something wrong")
+			fmt.Println("Something wrong")
 		}
 	}
 }
@@ -44,6 +60,16 @@ func getCommands() map[string]cliCommand {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Display list of location",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display list of previous location",
+			callback:    commandMapB,
 		},
 	}
 }
