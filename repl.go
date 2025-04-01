@@ -5,22 +5,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/G0SU19O2/pokedex/internal/pokeapi"
 )
 
 type config struct {
-	page int
+	pokeapiClient pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
 }
 
-func (c *config) Next() string {
-	c.page++
-	return fmt.Sprintf("https://pokeapi.co/api/v2/location?limit=20&offset=%d", c.page*20)
-}
-func (c *config) Previous() string {
-	if c.page > 0 {
-		c.page--
-	}
-	return fmt.Sprintf("https://pokeapi.co/api/v2/location?limit=20&offset=%d", c.page*20)
-}
 
 type cliCommand struct {
 	name        string
