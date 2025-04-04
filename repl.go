@@ -10,16 +10,15 @@ import (
 )
 
 type config struct {
-	pokeapiClient pokeapi.Client
+	pokeapiClient   pokeapi.Client
 	nextLocationURL *string
 	prevLocationURL *string
 }
 
-
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(config *config) error
+	callback    func(config *config, args ...string) error
 }
 
 func startRepl(cfg *config) {
@@ -37,7 +36,11 @@ func startRepl(cfg *config) {
 			fmt.Println("Unknown command")
 			continue
 		}
-		err := command.callback(cfg)
+		var args []string
+		if len(words) > 1 {
+			args = words[1:]
+		}
+		err := command.callback(cfg, args...)
 		if err != nil {
 			fmt.Println("Something wrong")
 		}
@@ -64,6 +67,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display list of previous location",
 			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Exploring",
+			callback:    commandExplore,
 		},
 	}
 }
